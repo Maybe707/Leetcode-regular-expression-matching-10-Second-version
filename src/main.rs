@@ -9,10 +9,10 @@ impl Solution {
 			current_p_symbol.is_ascii_lowercase() ||
 			current_p_symbol as char == '.' ||
 			current_p_symbol as char == '*' ||
-			current_p_symbol as char == '!') &&
+			current_p_symbol as char != '!') &&
 			(current_s_symbol.is_ascii_alphabetic() &&
 			 current_s_symbol.is_ascii_lowercase() ||
-			 current_s_symbol as char == '*') {
+			 current_s_symbol as char != '!') {
 			 	true
 			} else {
 				false
@@ -31,113 +31,67 @@ impl Solution {
 	}
 	
 	pub fn is_match(s: String, p: String) -> bool {
-		let p_stack = p.as_bytes();
-		let s_stack = s.as_bytes();
+		let mut p_stack: Vec<char> = p.chars().collect();
+		let mut s_stack: Vec<char> = s.chars().collect();
 
 		let mut p_iterator: usize = 0;
 		let mut s_iterator: usize = 0;
-		let mut current_p_symbol: char = '*';
-		let mut current_s_symbol: char = '*';
+		let mut current_p_symbol: char = '!';
+		let mut current_s_symbol: char = '!';
 		let mut asterisk_symbol_array: Vec<char> = vec![];
 		let mut consumed_symbols_number_after_asterisk: usize = 0;
-		let mut is_no_match: bool = true;
+		let mut is_match: bool = true;
+		let mut is_asterisk_next: bool = false;
 		
-		while p_iterator < p_stack.len() || s_iterator < s_stack.len()
+		while p_stack.len() > 0 || s_stack.len() > 0
 		{
- 			if p_iterator < p_stack.len() && p_iterator + 1 < p_stack.len() &&
-				p_stack[p_iterator + 1] as char == '*' {
-					consumed_symbols_number_after_asterisk = 0;
-					asterisk_symbol_array.clear();
-					while p_iterator + 1 < p_stack.len() &&
-						p_stack[p_iterator + 1] as char == '*' {
-							asterisk_symbol_array.push( p_stack[p_iterator] as char );
-							p_iterator += 2;
-						}
-				} else if p_iterator < p_stack.len() {
-					current_p_symbol = p_stack[p_iterator] as char;
-					//				p_iterator += 1;
+			if is_match {
+				if is_asterisk_next {
+					current_s_symbol = s_stack.pop().unwrap_or('!');
 				} else {
-					current_p_symbol = '!';
+					current_s_symbol = s_stack.pop().unwrap_or('!');
+					current_p_symbol = p_stack.pop().unwrap_or('!');
 				}
-			println!("p iterator: {}", p_iterator);
-			println!("p elem: {}", current_p_symbol);
-			if s_iterator < s_stack.len() {
-				current_s_symbol = s_stack[s_iterator] as char;
-				//				s_iterator += 1;
 			} else {
-				current_s_symbol = '!';
-			}
-			println!("s iterator: {}", s_iterator);
-			println!("s elem: {}", current_s_symbol);
-
-			if (asterisk_symbol_array.len() == 0 && p_iterator == p_stack.len() && s_iterator < s_stack.len()) ||
-				(s_iterator == s_stack.len() && p_iterator < p_stack.len()) {
-					println!("TESTS p iterator: {}", p_iterator);
+				if is_asterisk_next {
+					current_p_symbol = p_stack.pop().unwrap_or('!');
+					is_asterisk_next = false;
+				} else {
 					return false;
 				}
+			}
+			
+			if current_p_symbol == '*' {
+				is_asterisk_next = true;
+				current_p_symbol = p_stack.pop().unwrap_or('!');
+			}
+
+			if current_p_symbol == '!' || current_s_symbol == '!' {
+				return false;
+			}
+			
+			println!("current s symbol: {}", current_s_symbol);
+			println!("current p symbol: {}", current_p_symbol);
+			println!("s length: {}", s_stack.len());
+			println!("p length: {}", p_stack.len());
+
+			// if current_p_symbol == '!' || current_s_symbol == '!' {
+			// 	return false;
+			// }
 			
 			if Solution::is_symbols_correct( current_p_symbol, current_s_symbol ) {
-//				println!("TEST");
-				if current_p_symbol == current_s_symbol ||
-				current_p_symbol == '.' {
-					println!("case match");
-					p_iterator += 1;
-					s_iterator += 1;
-					is_no_match = false;
-
-					if asterisk_symbol_array.len() > 0 {
-						consumed_symbols_number_after_asterisk += 1;
+				if !is_asterisk_next && (current_p_symbol == current_s_symbol || current_p_symbol == '.') {
+					is_match = true;
+				 	continue;
+				} else if is_asterisk_next {
+					if current_p_symbol == current_s_symbol || current_p_symbol == '.' {
+						asterisk_symbol_array.push( current_s_symbol );
+						is_match = true;
+					} else {
+						is_match = false;
 					}
 				} else {
-					println!("case no match");
-					is_no_match = true;
-				}					
-
-				if is_no_match && asterisk_symbol_array.len() > 0 {
-					println!("case *");
-					Solution::shift_back_matched_symbols_to_first_after_asterisk(
-						&mut p_iterator, &mut s_iterator,
-						&mut consumed_symbols_number_after_asterisk, is_no_match
-					);
-
-					let s_iterator_old: usize = s_iterator;
-					if consumed_symbols_number_after_asterisk > 0 {
-						let mut asterisk_array_counter: usize = 0;
-						while asterisk_array_counter < asterisk_symbol_array.len() {
-							let current_asterisk_symbol: char = asterisk_symbol_array[asterisk_array_counter];
-							//						println!("* symbol: {}", consumed_symbols_number_after_asterisk);
-							let mut matched_substring_counter: usize = 0;
-							while matched_substring_counter < consumed_symbols_number_after_asterisk {
-  								if s_iterator < s_stack.len() && (current_asterisk_symbol == '.' ||
-									current_asterisk_symbol == s_stack[s_iterator] as char) {
-									println!("case 0 * symbol: {}", current_asterisk_symbol);
-									s_iterator += 1;
-								}
-								matched_substring_counter += 1;
-							}
-							asterisk_array_counter += 1;
-						}
-					} else {
-						let mut asterisk_array_counter: usize = 0;
-						while asterisk_array_counter < asterisk_symbol_array.len() {
-							let current_asterisk_symbol: char = asterisk_symbol_array[asterisk_array_counter];
-							//						println!("* symbol: {}", consumed_symbols_number_after_asterisk);
-  							if s_iterator < s_stack.len() && (current_asterisk_symbol == '.' ||
-								current_asterisk_symbol == s_stack[s_iterator] as char) {
-								println!("case 1 * symbol: {}", current_asterisk_symbol);
-								s_iterator += 1;
-								break;
-							}
-
-							asterisk_array_counter += 1;
-						}
-					}
-
-					if s_iterator == s_iterator_old {
-						return false;
-					}
-
-					consumed_symbols_number_after_asterisk = 0;
+					is_match = false;
 				}
 			}
 		}
@@ -147,7 +101,9 @@ impl Solution {
 
 		println!("final s iterator: {}", s_iterator);
 		println!("final s elem: {}", current_s_symbol);
-		
+
+		println!("array: {:?}", asterisk_symbol_array);
+
 		true
 	}
 }
@@ -165,8 +121,8 @@ fn main() {
 	// let s: String = String::from("mississippi");
 	// let p: String = String::from("mis*is*ip*.");
 	
-	// let s: String = String::from("aaa");
-	// let p: String = String::from("aaaa");
+	// let s: String = String::from("aaax");
+	// let p: String = String::from("aaax");
 
 	// let s: String = String::from("a");
 	// let p: String = String::from("ab*a");
@@ -180,8 +136,8 @@ fn main() {
 	// let s: String = String::from("aaa");
 	// let p: String = String::from("ab*a*c*a");
 
-	// let s: String = String::from("aa");
-	// let p: String = String::from("a");
+	// let s: String = String::from("zxawqeraaaaazxaazx");
+	// let p: String = String::from("zxa.*aazx");
 
 	// let s: String = String::from("aweraxcvwer");
 	// let p: String = String::from("a.*wer");
@@ -198,11 +154,11 @@ fn main() {
 	// let s: String = String::from("aaca");
 	// let p: String = String::from("ab*a*c*a");
 
-	// let s: String = String::from("aaca");
-	// let p: String = String::from("ab*a*c*a");
+	// let s: String = String::from("aaaaaaarc");
+	// let p: String = String::from("ab*a*r*c*aaarc");
 
-	let s: String = String::from("aaba");
-	let p: String = String::from("ab*a*c*a");
+	// let s: String = String::from("aaba");
+	// let p: String = String::from("ab*a*c*a");
 
 	// let s: String = String::from("a");
 	// let p: String = String::from("ab*");
@@ -216,5 +172,14 @@ fn main() {
 	// let s: String = String::from("bbbba");
 	// let p: String = String::from(".*a*a");
 
+	// let s: String = String::from("aaa");
+	// let p: String = String::from("a*a");
+
+	// let s: String = String::from("aa");
+	// let p: String = String::from("a");
+
+	let s: String = String::from("aab");
+	let p: String = String::from("c*a*b");
+	
 	println!("{}", Solution::is_match( s, p ));
 }
