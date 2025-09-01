@@ -67,6 +67,18 @@ impl Solution {
 			}
 
 			if current_p_symbol == '!' || current_s_symbol == '!' {
+				if current_p_symbol != '!' {
+					current_p_symbol = p_stack.pop().unwrap_or('!');
+					while current_p_symbol == '*' {
+						p_stack.pop();
+						current_p_symbol = p_stack.pop().unwrap_or('!');
+					}
+
+					if current_p_symbol == '!' {
+						return true;
+					}
+				}
+				
 				return false;
 			}
 			
@@ -74,10 +86,6 @@ impl Solution {
 			println!("current p symbol: {}", current_p_symbol);
 			println!("s length: {}", s_stack.len());
 			println!("p length: {}", p_stack.len());
-
-			// if current_p_symbol == '!' || current_s_symbol == '!' {
-			// 	return false;
-			// }
 			
 			if Solution::is_symbols_correct( current_p_symbol, current_s_symbol ) {
 				if !is_asterisk_next && (current_p_symbol == current_s_symbol || current_p_symbol == '.') {
