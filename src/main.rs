@@ -45,16 +45,40 @@ impl Solution {
 		
 		while p_stack.len() > 0 || s_stack.len() > 0
 		{
+			if p_stack.len() == 0 || s_stack.len() == 0 {
+				if p_stack.len() > 0 {
+					current_p_symbol = p_stack.pop().expect("boom");
+					while current_p_symbol == '*' && p_stack.len() > 1 {
+						p_stack.pop();
+						current_p_symbol = p_stack.pop().expect("boom");
+					}
+
+					if current_p_symbol == '!' {
+						return true;
+					}
+				}
+
+				return false;
+			}
+			
 			if is_match {
 				if is_asterisk_next {
-					current_s_symbol = s_stack.pop().unwrap_or('!');
+					if s_stack.len() > 0 {
+						current_s_symbol = s_stack.pop().expect("boom");
+					}
 				} else {
-					current_s_symbol = s_stack.pop().unwrap_or('!');
-					current_p_symbol = p_stack.pop().unwrap_or('!');
+					if s_stack.len() > 0 {
+						current_s_symbol = s_stack.pop().expect("boom");
+					}
+					if p_stack.len() > 0 {
+						current_p_symbol = p_stack.pop().expect("boom");
+					}
 				}
 			} else {
 				if is_asterisk_next {
-					current_p_symbol = p_stack.pop().unwrap_or('!');
+					if p_stack.len() > 0 {
+						current_p_symbol = p_stack.pop().expect("boom");
+					}
 					is_asterisk_next = false;
 				} else {
 					return false;
@@ -63,40 +87,31 @@ impl Solution {
 			
 			if current_p_symbol == '*' {
 				is_asterisk_next = true;
-				current_p_symbol = p_stack.pop().unwrap_or('!');
-			}
-
-			if current_p_symbol == '!' || current_s_symbol == '!' {
-				if current_p_symbol != '!' {
-					current_p_symbol = p_stack.pop().unwrap_or('!');
-					while current_p_symbol == '*' {
-						p_stack.pop();
-						current_p_symbol = p_stack.pop().unwrap_or('!');
-					}
-
-					if current_p_symbol == '!' {
-						return true;
-					}
+				if p_stack.len() > 0 {
+					current_p_symbol = p_stack.pop().expect("boom");
 				}
-				
-				return false;
 			}
+
 			
-			println!("current s symbol: {}", current_s_symbol);
-			println!("current p symbol: {}", current_p_symbol);
-			println!("s length: {}", s_stack.len());
-			println!("p length: {}", p_stack.len());
+			// println!("current s symbol: {}", current_s_symbol);
+			// println!("current p symbol: {}", current_p_symbol);
+			// println!("s length: {}", s_stack.len());
+			// println!("p length: {}", p_stack.len());
 			
 			if Solution::is_symbols_correct( current_p_symbol, current_s_symbol ) {
 				if !is_asterisk_next && (current_p_symbol == current_s_symbol || current_p_symbol == '.') {
 					is_match = true;
 				 	continue;
 				} else if is_asterisk_next {
-					if current_p_symbol == current_s_symbol || current_p_symbol == '.' {
+					while current_p_symbol == current_s_symbol || current_p_symbol == '.' {
 						asterisk_symbol_array.push( current_s_symbol );
+						if s_stack.len() > 0 {
+							current_s_symbol = s_stack.pop().expect("boom");
+						} else {
+							break;
+						}
+
 						is_match = true;
-					} else {
-						is_match = false;
 					}
 				} else {
 					is_match = false;
@@ -104,13 +119,13 @@ impl Solution {
 			}
 		}
 
-		println!("final p iterator: {}", p_iterator);
-		println!("final p elem: {}", current_p_symbol);
+		// println!("final p iterator: {}", p_iterator);
+		// println!("final p elem: {}", current_p_symbol);
 
-		println!("final s iterator: {}", s_iterator);
-		println!("final s elem: {}", current_s_symbol);
+		// println!("final s iterator: {}", s_iterator);
+		// println!("final s elem: {}", current_s_symbol);
 
-		println!("array: {:?}", asterisk_symbol_array);
+		// println!("array: {:?}", asterisk_symbol_array);
 
 		true
 	}
@@ -141,8 +156,8 @@ fn main() {
 	// let s: String = String::from("aaa");
 	// let p: String = String::from("ab*a*c*a");
 
-	// let s: String = String::from("aaa");
-	// let p: String = String::from("ab*a*c*a");
+	// let s: String = String::from("aaccca");
+	// let p: String = String::from("accb*a*c*a");
 
 	// let s: String = String::from("zxawqeraaaaazxaazx");
 	// let p: String = String::from("zxa.*aazx");
@@ -186,8 +201,17 @@ fn main() {
 	// let s: String = String::from("aa");
 	// let p: String = String::from("a");
 
-	let s: String = String::from("aab");
-	let p: String = String::from("c*a*b");
-	
+	// let s: String = String::from("aab");
+	// let p: String = String::from("c*a*b");
+
+	// let s: String = String::from("aaa");
+	// let p: String = String::from("aaaa");
+
+	// let s: String = String::from("aa");
+	// let p: String = String::from("a*");
+
+	let s: String = String::from("ab");
+	let p: String = String::from(".*");
+
 	println!("{}", Solution::is_match( s, p ));
 }
