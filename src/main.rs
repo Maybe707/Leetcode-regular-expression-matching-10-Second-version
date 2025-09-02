@@ -48,7 +48,22 @@ impl Solution {
 			if p_stack.len() == 0 && s_stack.len() > 0 {
 				return false;
 			} else if s_stack.len() == 0 && p_stack.len() > 0 {
-				
+				println!("ARRAY: {:?}", asterisk_symbol_array);
+				let mut is_last_current_s_matched: bool = false;
+				while p_stack.len() > 0 {
+					let mut current_p: char = p_stack.pop().expect("boom");
+					if current_p == '*' {
+						if p_stack.len() > 0 {
+							p_stack.pop();
+						}
+					} else {
+						if current_p == current_s_symbol && !is_last_current_s_matched {
+							is_last_current_s_matched = true;
+						} else {
+							return false;
+						}
+					}
+				}
 			}
 			
 			if is_match {
