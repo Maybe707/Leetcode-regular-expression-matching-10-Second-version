@@ -74,9 +74,13 @@ impl Solution {
 			
 			if is_match {
 				if is_asterisk_next {
-					if s_stack.len() > 0 {
-						current_s_symbol = s_stack.pop().expect("boom");
+					// if s_stack.len() > 0 {
+					// 	current_s_symbol = s_stack.pop().expect("boom");
+					// }
+					if p_stack.len() > 0 {
+						current_p_symbol = p_stack.pop().expect("boom");
 					}
+					is_asterisk_next = false;
 				} else {
 					if s_stack.len() > 0 {
 						current_s_symbol = s_stack.pop().expect("boom");
@@ -115,14 +119,14 @@ impl Solution {
 				 	continue;
 				} else if is_asterisk_next {
 					while current_p_symbol == current_s_symbol || current_p_symbol == '.' {
+						is_match = true;
+						println!("TEST: {}", current_p_symbol);
 						asterisk_symbol_array.push( current_s_symbol );
 						if s_stack.len() > 0 {
 							current_s_symbol = s_stack.pop().expect("boom");
 						} else {
 							break;
 						}
-
-						is_match = true;
 					}
 				} else {
 					is_match = false;
@@ -149,8 +153,8 @@ fn main() {
 	// let s: String = String::from("ab");
 	// let p: String = String::from(".*");
 
-	// let s: String = String::from("mississippi");
-	// let p: String = String::from("mis*is*p*.");
+	let s: String = String::from("mississippi");
+	let p: String = String::from("mis*is*p*.");
 
 	// let s: String = String::from("mississippi");
 	// let p: String = String::from("mis*is*ip*.");
@@ -212,8 +216,8 @@ fn main() {
 	// let s: String = String::from("aa");
 	// let p: String = String::from("a");
 
-	let s: String = String::from("aab");
-	let p: String = String::from("c*a*b");
+	// let s: String = String::from("aab");
+	// let p: String = String::from("c*a*b");
 
 	// let s: String = String::from("aaa");
 	// let p: String = String::from("aaaa");
@@ -224,5 +228,8 @@ fn main() {
 	// let s: String = String::from("ab");
 	// let p: String = String::from(".*");
 
+	let s: String = String::from("aaa");
+	let p: String = String::from("ab*a");
+	
 	println!("{}", Solution::is_match( s, p ));
 }
