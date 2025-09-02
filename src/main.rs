@@ -45,30 +45,10 @@ impl Solution {
 		
 		while p_stack.len() > 0 || s_stack.len() > 0
 		{
-			if (p_stack.len() == 0 || s_stack.len() == 0) && !is_asterisk_next {
-				println!("current s symbol 1: {}", current_s_symbol);
-				println!("current p symbol 1: {}", current_p_symbol);
-				println!("s length 1: {}", s_stack.len());
-				println!("p length 1: {}", p_stack.len());
-				println!("flag: {}", is_asterisk_next);
-
-				while p_stack.len() > 0 {
-					current_p_symbol = p_stack.pop().expect("boom");
-					if current_p_symbol == '*' {
-						p_stack.pop();
-						if p_stack.len() > 0 {
-							current_p_symbol = p_stack.pop().expect("boom");
-						}
-					} else {
-						return false;
-					}
-				}
-
-				if p_stack.len() == 0 && s_stack.len() == 0 {
-					return true;
-				}
-
+			if p_stack.len() == 0 && s_stack.len() > 0 {
 				return false;
+			} else if s_stack.len() == 0 && p_stack.len() > 0 {
+				
 			}
 			
 			if is_match {
