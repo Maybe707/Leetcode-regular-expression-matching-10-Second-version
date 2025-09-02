@@ -46,14 +46,25 @@ impl Solution {
 		while p_stack.len() > 0 || s_stack.len() > 0
 		{
 			if p_stack.len() == 0 || s_stack.len() == 0 {
+				println!("current s symbol 1: {}", current_s_symbol);
+				println!("current p symbol 1: {}", current_p_symbol);
+				println!("s length 1: {}", s_stack.len());
+				println!("p length 1: {}", p_stack.len());
+				println!("flag: {}", is_asterisk_next);
+
 				if p_stack.len() > 0 {
-					current_p_symbol = p_stack.pop().expect("boom");
-					while current_p_symbol == '*' && p_stack.len() > 1 {
-						p_stack.pop();
+					if is_asterisk_next {
 						current_p_symbol = p_stack.pop().expect("boom");
 					}
 
-					if current_p_symbol == '!' {
+					while current_p_symbol == '*' && p_stack.len() > 0 {
+						p_stack.pop();
+						if p_stack.len() > 0 {
+							current_p_symbol = p_stack.pop().expect("boom");
+						}
+					}
+
+					if p_stack.len() == 0 {
 						return true;
 					}
 				}
@@ -93,10 +104,10 @@ impl Solution {
 			}
 
 			
-			// println!("current s symbol: {}", current_s_symbol);
-			// println!("current p symbol: {}", current_p_symbol);
-			// println!("s length: {}", s_stack.len());
-			// println!("p length: {}", p_stack.len());
+			println!("current s symbol: {}", current_s_symbol);
+			println!("current p symbol: {}", current_p_symbol);
+			println!("s length: {}", s_stack.len());
+			println!("p length: {}", p_stack.len());
 			
 			if Solution::is_symbols_correct( current_p_symbol, current_s_symbol ) {
 				if !is_asterisk_next && (current_p_symbol == current_s_symbol || current_p_symbol == '.') {
@@ -119,13 +130,13 @@ impl Solution {
 			}
 		}
 
-		// println!("final p iterator: {}", p_iterator);
-		// println!("final p elem: {}", current_p_symbol);
+		println!("final p iterator: {}", p_iterator);
+		println!("final p elem: {}", current_p_symbol);
 
-		// println!("final s iterator: {}", s_iterator);
-		// println!("final s elem: {}", current_s_symbol);
+		println!("final s iterator: {}", s_iterator);
+		println!("final s elem: {}", current_s_symbol);
 
-		// println!("array: {:?}", asterisk_symbol_array);
+		println!("array: {:?}", asterisk_symbol_array);
 
 		true
 	}
@@ -201,8 +212,8 @@ fn main() {
 	// let s: String = String::from("aa");
 	// let p: String = String::from("a");
 
-	// let s: String = String::from("aab");
-	// let p: String = String::from("c*a*b");
+	let s: String = String::from("aab");
+	let p: String = String::from("c*a*b");
 
 	// let s: String = String::from("aaa");
 	// let p: String = String::from("aaaa");
@@ -210,8 +221,8 @@ fn main() {
 	// let s: String = String::from("aa");
 	// let p: String = String::from("a*");
 
-	let s: String = String::from("ab");
-	let p: String = String::from(".*");
+	// let s: String = String::from("ab");
+	// let p: String = String::from(".*");
 
 	println!("{}", Solution::is_match( s, p ));
 }
