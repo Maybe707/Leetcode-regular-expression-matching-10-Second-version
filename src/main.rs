@@ -47,23 +47,6 @@ impl Solution {
 		{
 			if p_stack.len() == 0 && s_stack.len() > 0 {
 				return false;
-			} else if s_stack.len() == 0 && p_stack.len() > 0 {
-				println!("ARRAY: {:?}", asterisk_symbol_array);
-				let mut is_last_current_s_matched: bool = false;
-				while p_stack.len() > 0 {
-					let mut current_p: char = p_stack.pop().expect("boom");
-					if current_p == '*' {
-						if p_stack.len() > 0 {
-							p_stack.pop();
-						}
-					} else {
-						if current_p == current_s_symbol && !is_last_current_s_matched {
-							is_last_current_s_matched = true;
-						} else {
-							return false;
-						}
-					}
-				}
 			}
 			
 			if is_match {
@@ -73,20 +56,28 @@ impl Solution {
 					// }
 					if p_stack.len() > 0 {
 						current_p_symbol = p_stack.pop().expect("boom");
+					} else {
+						current_p_symbol = '!';
 					}
 					is_asterisk_next = false;
 				} else {
 					if s_stack.len() > 0 {
 						current_s_symbol = s_stack.pop().expect("boom");
+					} else {
+						current_s_symbol = '!';
 					}
 					if p_stack.len() > 0 {
 						current_p_symbol = p_stack.pop().expect("boom");
+					} else {
+						current_p_symbol = '!';
 					}
 				}
 			} else {
 				if is_asterisk_next {
 					if p_stack.len() > 0 {
 						current_p_symbol = p_stack.pop().expect("boom");
+					} else {
+						current_p_symbol = '!';
 					}
 					is_asterisk_next = false;
 				} else {
@@ -127,6 +118,10 @@ impl Solution {
 				} else {
 					println!("no match case");
 					is_match = false;
+				}
+			} else {
+				if !is_asterisk_next {
+					return false;
 				}
 			}
 		}
@@ -228,11 +223,11 @@ fn main() {
 	// let s: String = String::from("aaa");
 	// let p: String = String::from("ab*a");
 
-	// let s: String = String::from("ab");
-	// let p: String = String::from(".*..");
+	let s: String = String::from("ab");
+	let p: String = String::from(".*..");
 
-	let s: String = String::from("aaa");
-	let p: String = String::from("ab*ac*a");
+	// let s: String = String::from("aaa");
+	// let p: String = String::from("ab*ac*a");
 	
 	println!("{}", Solution::is_match( s, p ));
 }
