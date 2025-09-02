@@ -45,28 +45,27 @@ impl Solution {
 		
 		while p_stack.len() > 0 || s_stack.len() > 0
 		{
-			if p_stack.len() == 0 || s_stack.len() == 0 {
+			if (p_stack.len() == 0 || s_stack.len() == 0) && !is_asterisk_next {
 				println!("current s symbol 1: {}", current_s_symbol);
 				println!("current p symbol 1: {}", current_p_symbol);
 				println!("s length 1: {}", s_stack.len());
 				println!("p length 1: {}", p_stack.len());
 				println!("flag: {}", is_asterisk_next);
 
-				if p_stack.len() > 0 {
-					if is_asterisk_next {
-						current_p_symbol = p_stack.pop().expect("boom");
-					}
-
-					while current_p_symbol == '*' && p_stack.len() > 0 {
+				while p_stack.len() > 0 {
+					current_p_symbol = p_stack.pop().expect("boom");
+					if current_p_symbol == '*' {
 						p_stack.pop();
 						if p_stack.len() > 0 {
 							current_p_symbol = p_stack.pop().expect("boom");
 						}
+					} else {
+						return false;
 					}
+				}
 
-					if p_stack.len() == 0 {
-						return true;
-					}
+				if p_stack.len() == 0 && s_stack.len() == 0 {
+					return true;
 				}
 
 				return false;
@@ -115,12 +114,14 @@ impl Solution {
 			
 			if Solution::is_symbols_correct( current_p_symbol, current_s_symbol ) {
 				if !is_asterisk_next && (current_p_symbol == current_s_symbol || current_p_symbol == '.') {
+					println!("match case");
 					is_match = true;
 				 	continue;
 				} else if is_asterisk_next {
+					println!("* case");
 					while current_p_symbol == current_s_symbol || current_p_symbol == '.' {
 						is_match = true;
-						println!("TEST: {}", current_p_symbol);
+						println!("* match: {}", current_p_symbol);
 						asterisk_symbol_array.push( current_s_symbol );
 						if s_stack.len() > 0 {
 							current_s_symbol = s_stack.pop().expect("boom");
@@ -129,6 +130,7 @@ impl Solution {
 						}
 					}
 				} else {
+					println!("no match case");
 					is_match = false;
 				}
 			}
@@ -153,8 +155,8 @@ fn main() {
 	// let s: String = String::from("ab");
 	// let p: String = String::from(".*");
 
-	let s: String = String::from("mississippi");
-	let p: String = String::from("mis*is*p*.");
+	// let s: String = String::from("mississippi");
+	// let p: String = String::from("mis*is*p*.");
 
 	// let s: String = String::from("mississippi");
 	// let p: String = String::from("mis*is*ip*.");
@@ -228,8 +230,14 @@ fn main() {
 	// let s: String = String::from("ab");
 	// let p: String = String::from(".*");
 
+	// let s: String = String::from("aaa");
+	// let p: String = String::from("ab*a");
+
+	// let s: String = String::from("ab");
+	// let p: String = String::from(".*..");
+
 	let s: String = String::from("aaa");
-	let p: String = String::from("ab*a");
+	let p: String = String::from("ab*ac*a");
 	
 	println!("{}", Solution::is_match( s, p ));
 }
