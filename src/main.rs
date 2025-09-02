@@ -48,7 +48,7 @@ impl Solution {
 			if p_stack.len() == 0 && s_stack.len() > 0 {
 				return false;
 			}
-			
+
 			if is_match {
 				if is_asterisk_next {
 					// if s_stack.len() > 0 {
@@ -81,7 +81,29 @@ impl Solution {
 					}
 					is_asterisk_next = false;
 				} else {
-					return false;
+					let mut is_matched: bool = false;
+					if s_stack.len() == 0 && p_stack.len() > 0 {
+						asterisk_symbol_array.reverse();
+						println!("ARRAY: {:?}", asterisk_symbol_array);
+						while asterisk_symbol_array.len() > 0 {
+							let current_elem: char = asterisk_symbol_array.pop().expect("boom");
+							if current_elem == current_p_symbol {
+								if p_stack.len() > 0 {
+									current_p_symbol = p_stack.pop().expect("boom");
+								} else {
+									current_p_symbol = '!';
+								}
+
+								is_matched = true;
+								break;
+							}
+						}
+					}
+					println!("ARRAY: {:?}", asterisk_symbol_array);
+					println!("is matched: {}", is_matched);
+					if !is_matched {
+						return false;
+					}
 				}
 			}
 			
@@ -117,6 +139,10 @@ impl Solution {
 					}
 				} else {
 					println!("no match case");
+					if s_stack.len() == 0 && p_stack.len() == 0 {
+						return false;
+					}
+					
 					is_match = false;
 				}
 			} else {
@@ -223,11 +249,17 @@ fn main() {
 	// let s: String = String::from("aaa");
 	// let p: String = String::from("ab*a");
 
-	let s: String = String::from("ab");
-	let p: String = String::from(".*..");
+	// let s: String = String::from("ab");
+	// let p: String = String::from(".*..");
 
 	// let s: String = String::from("aaa");
 	// let p: String = String::from("ab*ac*a");
-	
+
+	// let s: String = String::from("abcdede");
+	// let p: String = String::from("ab.*de");
+
+	let s: String = String::from("a");
+	let p: String = String::from("b");
+
 	println!("{}", Solution::is_match( s, p ));
 }
