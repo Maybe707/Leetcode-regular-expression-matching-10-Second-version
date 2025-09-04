@@ -137,6 +137,7 @@ impl Solution {
 							break;
 						}
 					}
+					continue;
 				} else {
 					println!("no match case");
 					if s_stack.len() == 0 && p_stack.len() == 0 {
@@ -144,12 +145,16 @@ impl Solution {
 					}
 					
 					is_match = false;
+					continue;
 				}
 			} else {
 				if !is_asterisk_next {
 					return false;
 				}
 			}
+
+			current_p_symbol = '#';
+			current_s_symbol = '#';
 		}
 
 		println!("final p iterator: {}", p_iterator);
@@ -165,8 +170,8 @@ impl Solution {
 }
 
 fn main() {
-	let s: String = String::from("abb");
-	let p: String = String::from("b*");
+	let s: String = String::from("abcdede");
+	let p: String = String::from("ab.*de");
 
 	println!("{}", Solution::is_match( s, p ));
 }
