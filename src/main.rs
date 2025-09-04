@@ -42,6 +42,7 @@ impl Solution {
 		let mut consumed_symbols_number_after_asterisk: usize = 0;
 		let mut is_match: bool = true;
 		let mut is_asterisk_next: bool = false;
+		let mut is_asterisk_match: bool = false;
 		
 		while p_stack.len() > 0 || s_stack.len() > 0
 		{
@@ -128,15 +129,18 @@ impl Solution {
 				} else if is_asterisk_next {
 					println!("* case");
 					while current_p_symbol == current_s_symbol || current_p_symbol == '.' {
+						is_asterisk_match = true;
 						is_match = true;
 						println!("* match: {}", current_p_symbol);
 						asterisk_symbol_array.push( current_s_symbol );
 						if s_stack.len() > 0 {
 							current_s_symbol = s_stack.pop().expect("boom");
+							is_asterisk_match = false;
 						} else {
 							break;
 						}
 					}
+
 					continue;
 				} else {
 					println!("no match case");
@@ -148,6 +152,7 @@ impl Solution {
 					continue;
 				}
 			} else {
+				is_asterisk_match = true;
 				if !is_asterisk_next {
 					return false;
 				}
@@ -164,14 +169,18 @@ impl Solution {
 		println!("final s elem: {}", current_s_symbol);
 
 		println!("array: {:?}", asterisk_symbol_array);
-
-		true
+		
+		if !is_asterisk_match && is_asterisk_next {
+			return false;
+		} else {
+			return true;
+		}
 	}
 }
 
 fn main() {
-	let s: String = String::from("abcdede");
-	let p: String = String::from("ab.*de");
+	let s: String = String::from("ab");
+	let p: String = String::from(".*..");
 
 	println!("{}", Solution::is_match( s, p ));
 }
