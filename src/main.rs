@@ -39,6 +39,8 @@ impl Solution {
 		let mut current_p_symbol: char = '!';
 		let mut current_s_symbol: char = '!';
 		let mut asterisk_symbol_array: Vec<char> = vec![];
+		let mut no_machted_substring: Vec<char> = vec![];
+		let mut asterisk_symbol_array_iterator: usize = 0;
 		let mut consumed_symbols_number_after_asterisk: usize = 0;
 		let mut is_s_match: bool = true;
 		let mut is_p_match: bool = true;
@@ -110,6 +112,38 @@ impl Solution {
 						is_asterisk_next = false;
 					} else {
 						println!("no match case");
+						let mut asterisk_symbol_array_temp: Vec<char> = asterisk_symbol_array.clone();
+						asterisk_symbol_array_temp.reverse();
+						no_machted_substring.push( current_p_symbol );
+						let mut no_matched_substring_temp: Vec<char> = no_machted_substring.clone();
+						no_matched_substring_temp.reverse();
+						println!("reversed array: {:?}", asterisk_symbol_array_temp);
+						println!("substring: {:?}", no_matched_substring_temp);
+						let mut outer_counter: usize = asterisk_symbol_array_iterator;
+						while outer_counter < asterisk_symbol_array_temp.len() {
+							println!("iter #: {}", outer_counter);
+							let mut is_contain_substring: bool = false;
+							let mut inner_counter: usize = 0;
+							while inner_counter < no_matched_substring_temp.len() &&
+								outer_counter + inner_counter < asterisk_symbol_array_temp.len() {
+									if no_matched_substring_temp[inner_counter] ==
+										asterisk_symbol_array_temp[outer_counter + inner_counter] ||
+										no_matched_substring_temp[inner_counter] == '.' {
+											println!("ELEM: {}", asterisk_symbol_array_temp[outer_counter + inner_counter]);
+											is_contain_substring = true;
+										} else {
+											is_contain_substring = false;
+											break;
+										}
+									inner_counter += 1;
+								}
+							if is_contain_substring {
+								break;
+							}
+							outer_counter += 1;
+						}
+						asterisk_symbol_array_iterator = outer_counter;
+						
 						if s_stack.len() == 0 && p_stack.len() == 0 {
 							return false;
 						}
@@ -132,8 +166,11 @@ impl Solution {
 }
 
 fn main() {
-	let s: String = String::from("abbabaaaaaaacaa");  // 14 last index
-	let p: String = String::from("a*.*b.a.*c*b*a*c*");  // 16 last index
+	// let s: String = String::from("abbabaaaaaaacaa");  // 14 last index
+	// let p: String = String::from("a*.*b.a.*c*b*a*c*");  // 16 last index
+
+	let s: String = String::from("ab");  // 14 last index
+	let p: String = String::from(".*c");  // 16 last index
 
 	println!("{}", Solution::is_match( s, p ));
 }
