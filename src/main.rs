@@ -40,7 +40,8 @@ impl Solution {
 		let mut current_s_symbol: char = '!';
 		let mut asterisk_symbol_array: Vec<char> = vec![];
 		let mut consumed_symbols_number_after_asterisk: usize = 0;
-		let mut is_match: bool = true;
+		let mut is_s_match: bool = true;
+		let mut is_p_match: bool = true;
 		let mut is_asterisk_next: bool = false;
 		let mut is_asterisk_match: bool = false;
 		
@@ -50,62 +51,14 @@ impl Solution {
 				return false;
 			}
 
-			if is_match {
-				if is_asterisk_next {
-					// if s_stack.len() > 0 {
-					// 	current_s_symbol = s_stack.pop().expect("boom");
-					// }
-					if p_stack.len() > 0 {
-						current_p_symbol = p_stack.pop().expect("boom");
-					} else {
-						current_p_symbol = '!';
-					}
-					is_asterisk_next = false;
-				} else {
-					if s_stack.len() > 0 {
-						current_s_symbol = s_stack.pop().expect("boom");
-					} else {
-						current_s_symbol = '!';
-					}
-					if p_stack.len() > 0 {
-						current_p_symbol = p_stack.pop().expect("boom");
-					} else {
-						current_p_symbol = '!';
-					}
-				}
-			} else {
-				if is_asterisk_next {
-					if p_stack.len() > 0 {
-						current_p_symbol = p_stack.pop().expect("boom");
-					} else {
-						current_p_symbol = '!';
-					}
-					is_asterisk_next = false;
-				} else {
-					let mut is_matched: bool = false;
-					if s_stack.len() == 0 && p_stack.len() > 0 {
-						asterisk_symbol_array.reverse();
-						println!("ARRAY: {:?}", asterisk_symbol_array);
-						while asterisk_symbol_array.len() > 0 {
-							let current_elem: char = asterisk_symbol_array.pop().expect("boom");
-							if current_elem == current_p_symbol {
-								if p_stack.len() > 0 {
-									current_p_symbol = p_stack.pop().expect("boom");
-								} else {
-									current_p_symbol = '!';
-								}
+			if s_stack.len() > 0 && is_s_match {
+				current_s_symbol = s_stack.pop().expect("boom");
+			} else if s_stack.len() == 0 {
+				current_s_symbol = '#';
+			}
 
-								is_matched = true;
-								break;
-							}
-						}
-					}
-					println!("ARRAY: {:?}", asterisk_symbol_array);
-					println!("is matched: {}", is_matched);
-					if !is_matched {
-						return false;
-					}
-				}
+			if p_stack.len() > 0 && is_p_match {
+				current_p_symbol = p_stack.pop().expect("boom");
 			}
 			
 			if current_p_symbol == '*' {
@@ -120,46 +73,50 @@ impl Solution {
 			println!("current p symbol: {}", current_p_symbol);
 			println!("s length: {}", s_stack.len());
 			println!("p length: {}", p_stack.len());
+//			asterisk_symbol_array.reverse();
+			println!("AR: {:?}", asterisk_symbol_array);
 			
 			if Solution::is_symbols_correct( current_p_symbol, current_s_symbol ) {
-				if !is_asterisk_next && (current_p_symbol == current_s_symbol || current_p_symbol == '.') {
-					println!("match case");
-					is_match = true;
-				 	continue;
-				} else if is_asterisk_next {
-					println!("* case");
-					while current_p_symbol == current_s_symbol || current_p_symbol == '.' {
-						is_asterisk_match = true;
-						is_match = true;
-						println!("* match: {}", current_p_symbol);
-						asterisk_symbol_array.push( current_s_symbol );
-						if s_stack.len() > 0 {
-							current_s_symbol = s_stack.pop().expect("boom");
-							is_asterisk_match = false;
-						} else {
-							break;
+				if !is_asterisk_next && current_s_symbol != '#' &&
+					(current_p_symbol == current_s_symbol || current_p_symbol == '.') {
+						println!("match case");
+						is_s_match = true;
+						is_p_match = true;
+					} else if is_asterisk_next {
+						println!("* case");
+						while s_stack.len() > 0 {
+							if (current_p_symbol == current_s_symbol ||
+								current_p_symbol == '.') && current_s_symbol != '#' {
+									is_s_match = true;
+									println!("* match: {}", current_p_symbol);
+									asterisk_symbol_array.push( current_s_symbol );
+									current_s_symbol = s_stack.pop().expect("boom");
+								} else {
+									is_s_match = false;
+									break;
+								}
+						}
+
+						if (current_p_symbol == current_s_symbol ||
+							current_p_symbol == '.') && current_s_symbol != '#' {
+								is_s_match = true;
+								println!("* last match: {}", current_p_symbol);
+								asterisk_symbol_array.push( current_s_symbol );
+							} else {
+								is_s_match = false;
+							}
+
+						is_p_match = true;
+						is_asterisk_next = false;
+					} else {
+						println!("no match case");
+						if s_stack.len() == 0 && p_stack.len() == 0 {
+							return false;
 						}
 					}
-
-					continue;
-				} else {
-					println!("no match case");
-					if s_stack.len() == 0 && p_stack.len() == 0 {
-						return false;
-					}
-					
-					is_match = false;
-					continue;
-				}
 			} else {
-				is_asterisk_match = true;
-				if !is_asterisk_next {
-					return false;
-				}
+				println!("wrong symbol case");
 			}
-
-			current_p_symbol = '#';
-			current_s_symbol = '#';
 		}
 
 		println!("final p iterator: {}", p_iterator);
@@ -169,18 +126,14 @@ impl Solution {
 		println!("final s elem: {}", current_s_symbol);
 
 		println!("array: {:?}", asterisk_symbol_array);
-		
-		if !is_asterisk_match && is_asterisk_next {
-			return false;
-		} else {
-			return true;
-		}
+
+		true
 	}
 }
 
 fn main() {
-	let s: String = String::from("ab");
-	let p: String = String::from(".*..");
+	let s: String = String::from("abbabaaaaaaacaa");  // 14 last index
+	let p: String = String::from("a*.*b.a.*c*b*a*c*");  // 16 last index
 
 	println!("{}", Solution::is_match( s, p ));
 }
