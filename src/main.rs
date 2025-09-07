@@ -174,8 +174,8 @@ fn main() {
 	// let s: String = String::from("abbabaaaaaaacaa");  // 14 last index
 	// let p: String = String::from("a*.*b.a.*c*b*a*c*");  // 16 last index
 
-	let s: String = String::from("aaa");  // 14 last index
-	let p: String = String::from("ab*ac*a");  // 16 last index
+	let s: String = String::from("a");  // 14 last index
+	let p: String = String::from(".*..a*");  // 16 last index
 
 	println!("{}", Solution::is_match( s, p ));
 }
