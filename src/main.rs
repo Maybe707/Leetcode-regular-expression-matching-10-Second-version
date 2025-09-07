@@ -55,12 +55,16 @@ impl Solution {
 
 			if s_stack.len() > 0 && is_s_match {
 				current_s_symbol = s_stack.pop().expect("boom");
-			} else if s_stack.len() == 0 {
+			} else if s_stack.len() == 0 && !is_asterisk_next {
 				current_s_symbol = '#';
 			}
 
 			if p_stack.len() > 0 && is_p_match {
 				current_p_symbol = p_stack.pop().expect("boom");
+			}
+
+			if is_asterisk_next {
+				is_asterisk_next = false;
 			}
 			
 			if current_p_symbol == '*' {
@@ -108,8 +112,7 @@ impl Solution {
 								is_s_match = false;
 							}
 
-						is_p_match = true;
-						is_asterisk_next = false;
+						println!("* is s matched: {}", is_s_match);
 					} else {
 						println!("no match case");
 						let mut asterisk_symbol_array_temp: Vec<char> = asterisk_symbol_array.clone();
