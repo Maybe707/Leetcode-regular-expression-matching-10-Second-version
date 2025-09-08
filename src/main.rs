@@ -55,12 +55,14 @@ impl Solution {
 
 			if s_stack.len() > 0 && is_s_match {
 				current_s_symbol = s_stack.pop().expect("boom");
-			} else if s_stack.len() == 0 && !is_asterisk_next {
+			} else if s_stack.len() == 0 && is_s_match {
 				current_s_symbol = '#';
 			}
 
 			if p_stack.len() > 0 && is_p_match {
 				current_p_symbol = p_stack.pop().expect("boom");
+			} else if p_stack.len() == 0 && is_p_match {
+				current_p_symbol = '#';
 			}
 
 			if is_asterisk_next {
@@ -88,6 +90,13 @@ impl Solution {
 						println!("match case");
 						is_s_match = true;
 						is_p_match = true;
+
+						if s_stack.len() == 0 {
+							current_s_symbol = '#';
+						}
+						if p_stack.len() == 0 {
+							current_p_symbol = '#';
+						}
 					} else if is_asterisk_next {
 						println!("* case");
 						while s_stack.len() > 0 {
@@ -112,6 +121,12 @@ impl Solution {
 								is_s_match = false;
 							}
 
+						if s_stack.len() == 0 && is_s_match {
+							current_s_symbol = '#';
+						}
+						if p_stack.len() == 0 {
+							current_p_symbol = '#';
+						}
 						println!("* is s matched: {}", is_s_match);
 					} else {
 						println!("no match case");
@@ -123,7 +138,7 @@ impl Solution {
 						println!("reversed array: {:?}", asterisk_symbol_array_temp);
 						println!("substring: {:?}", no_matched_substring_temp);
 						let mut is_contain_substring: bool = false;
-						let mut outer_counter: usize = asterisk_symbol_array_iterator;
+						let mut outer_counter: usize = 0;
 						while outer_counter < asterisk_symbol_array_temp.len() {
 							println!("iter #: {}", outer_counter);
 							let mut inner_counter: usize = 0;
@@ -146,10 +161,14 @@ impl Solution {
 							outer_counter += 1;
 						}
 						asterisk_symbol_array_iterator = outer_counter;
-						println!("is s matched: {}", is_s_match);						
-						if s_stack.len() == 0 && p_stack.len() == 0 {
+						println!("is s matched: {}", is_s_match);
+						if p_stack.len() == 0 && is_contain_substring {
+							current_p_symbol = '#';
+						}
+						
+						if !is_contain_substring {
 							return false;
-						} else if !is_contain_substring {
+						} else if no_matched_substring_temp.len() > asterisk_symbol_array_temp.len() {
 							return false;
 						}
 					}
@@ -166,7 +185,11 @@ impl Solution {
 
 		println!("array: {:?}", asterisk_symbol_array);
 
-		true
+		if current_p_symbol == '#' && current_s_symbol == '#' {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 
@@ -174,8 +197,8 @@ fn main() {
 	// let s: String = String::from("abbabaaaaaaacaa");  // 14 last index
 	// let p: String = String::from("a*.*b.a.*c*b*a*c*");  // 16 last index
 
-	let s: String = String::from("a");  // 14 last index
-	let p: String = String::from(".*..a*");  // 16 last index
+	let s: String = String::from("aab");  // 14 last index
+	let p: String = String::from("b.*");  // 16 last index
 
 	println!("{}", Solution::is_match( s, p ));
 }
