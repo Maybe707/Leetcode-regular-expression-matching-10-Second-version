@@ -138,7 +138,7 @@ impl Solution {
 						println!("reversed array: {:?}", asterisk_symbol_array_temp);
 						println!("substring: {:?}", no_matched_substring_temp);
 						let mut is_contain_substring: bool = false;
-						let mut outer_counter: usize = 0;
+						let mut outer_counter: usize = asterisk_symbol_array_iterator;
 						while outer_counter < asterisk_symbol_array_temp.len() {
 							println!("iter #: {}", outer_counter);
 							let mut inner_counter: usize = 0;
@@ -160,11 +160,22 @@ impl Solution {
 							}
 							outer_counter += 1;
 						}
-						asterisk_symbol_array_iterator = outer_counter;
 						println!("is s matched: {}", is_s_match);
-						if p_stack.len() == 0 && is_contain_substring {
+						if p_stack.len() == 0 && is_contain_substring && outer_counter == 0 {
 							current_p_symbol = '#';
+						} else if is_contain_substring {
+							if current_s_symbol != '#' {
+								s_stack.push( current_s_symbol );
+								is_s_match = true;
+							}
+							let mut counter: usize = asterisk_symbol_array_iterator;
+							asterisk_symbol_array_iterator = outer_counter;
+							while counter < asterisk_symbol_array_iterator {
+								s_stack.push( asterisk_symbol_array_temp[ counter ] );
+								counter += 1;
+							}
 						}
+						println!("s_stack after fill: {:?}", s_stack);
 						
 						if !is_contain_substring {
 							return false;
@@ -196,6 +207,9 @@ impl Solution {
 fn main() {
 	// let s: String = String::from("abbabaaaaaaacaa");  // 14 last index
 	// let p: String = String::from("a*.*b.a.*c*b*a*c*");  // 16 last index
+
+	// let s: String = String::from("qweacbmzcab");  // 14 last index
+	// let p: String = String::from("qweacbmzca*ab.*");  // 16 last index
 
 	let s: String = String::from("aab");  // 14 last index
 	let p: String = String::from("b.*");  // 16 last index
