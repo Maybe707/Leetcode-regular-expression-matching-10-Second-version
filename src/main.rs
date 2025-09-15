@@ -80,7 +80,6 @@ impl Solution {
 				current_s_symbol = '#';
 			}
 
-			println!("current symbol: {}", current_s_symbol);
 			let mut regexp_iterator: usize = 0;
 			let regexp_array_size: usize = regexp_array.len();
 			while regexp_iterator < regexp_array_size {
@@ -91,16 +90,15 @@ impl Solution {
 						if current_iterator > 0 &&
 							current_regexp_symbol.symbol_type[current_iterator - 1] ==
 							current_s_symbol {
-							current_regexp_symbol.symbols.push( current_s_symbol );
-							println!("current regexp symbol 0: {:?}", current_regexp_symbol.symbols);
-						}
+								current_regexp_symbol.symbols.push( current_s_symbol );
+							}
 						break;
 					} else if current_regexp_symbol.max == usize::MAX && current_regexp_symbol.min == 0 {
 						let current_iterator: usize = current_regexp_symbol.symbol_type.len();
-						if current_iterator > 0 && current_regexp_symbol.symbol_type[current_iterator - 1] == '.' {
-							current_regexp_symbol.symbols.push( current_s_symbol );
-							println!("current regexp symbol 1: {:?}", current_regexp_symbol.symbols);
-						} else if current_iterator > 0 &&
+						if current_iterator > 0 &&
+							current_regexp_symbol.symbol_type[current_iterator - 1] == '.' {
+								current_regexp_symbol.symbols.push( current_s_symbol );
+							} else if current_iterator > 0 &&
 							current_regexp_symbol.symbol_type[current_iterator - 1] ==
 							current_s_symbol {
 								
@@ -112,6 +110,24 @@ impl Solution {
 			}
 		}
 
+		let mut regexp_iterator: usize = 0;
+		while regexp_iterator < regexp_array.len() {
+			let current_regexp_symbol: &mut RegexpSymbol = &mut regexp_array[regexp_iterator];
+			println!("current regexp symbol: {:?}", current_regexp_symbol.symbols);			
+			println!("symbol type: {:?}", current_regexp_symbol.symbol_type);
+			if current_regexp_symbol.max == 1 && current_regexp_symbol.min == 1 {
+				if current_regexp_symbol.symbols.len() == 1 {
+				} else if current_regexp_symbol.symbols.len() == 0 {
+					
+				}
+					
+			} else if current_regexp_symbol.max == usize::MAX &&
+				current_regexp_symbol.min == 0 {
+				}
+			
+			regexp_iterator += 1;
+		}
+		
 		true
 	}
 }
