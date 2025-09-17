@@ -1,4 +1,4 @@
-use std::{thread::current, time::Duration};
+use std::{any::type_name, thread::current, time::Duration};
 
 struct Solution {
 }
@@ -37,6 +37,7 @@ impl Solution {
 		symbols: vec![], min: 0, max: 0 };
 		let mut current_s_symbol: char = '!';
 		let mut regexp_array: Vec<RegexpSymbol> = vec![];
+		let mut carry_accumulator: char = '!';
 		let mut counter: usize = 0;
 		while p_stack.len() > 0 {
 			regexp_array.push( RegexpSymbol { symbol_type: vec![], symbols: vec![], min: 0, max: 0 } );
@@ -112,13 +113,56 @@ impl Solution {
 
 		let mut regexp_iterator: usize = 0;
 		while regexp_iterator < regexp_array.len() {
-			let current_regexp_symbol: &mut RegexpSymbol = &mut regexp_array[regexp_iterator];
+			let current_regexp_symbol: RegexpSymbol = regexp_array[regexp_iterator].clone();
 			println!("current regexp symbol: {:?}", current_regexp_symbol.symbols);			
 			println!("symbol type: {:?}", current_regexp_symbol.symbol_type);
-			if current_regexp_symbol.max == 1 && current_regexp_symbol.min == 1 {
+			if current_regexp_symbol.max == 1 && current_regexp_symbol.min == 1 {      // Face single symbol
 				if current_regexp_symbol.symbols.len() == 1 {
-				} else if current_regexp_symbol.symbols.len() == 0 {
-					
+				} else if current_regexp_symbol.symbols.len() == 0 {                 // Non matched case
+					let mut inner_iterator: usize = 0;
+					while inner_iterator < regexp_iterator {
+						println!("inner: {}", inner_iterator);
+						if regexp_array[inner_iterator].max == 1 && regexp_array[inner_iterator].min == 1 {
+							println!("single element");
+							let mut symbol: char = '!';
+							if regexp_array[inner_iterator].symbols.len() > 0 {
+								symbol = regexp_array[inner_iterator].symbols[0];
+							}
+
+							let symbol_type: char = regexp_array[inner_iterator].symbol_type[0];
+							if carry_accumulator != '!' && symbol_type != '.' && symbol != carry_accumulator {
+								//								s_stack.push( symbol );
+								regexp_array[inner_iterator].symbols.clear();
+								regexp_array[inner_iterator].symbols.push( carry_accumulator );
+								println!("CARRY");
+								carry_accumulator = '!';
+							} else if symbol_type == '.' {
+								let temp_symbol: char = regexp_array[inner_iterator].symbols.pop().expect("boom");
+								regexp_array[inner_iterator].symbols.push( carry_accumulator );
+								println!("TEMP SYMBOL: {}", temp_symbol);
+								carry_accumulator = temp_symbol;
+							}
+						} else if regexp_array[inner_iterator].max == usize::MAX && regexp_array[inner_iterator].min == 0 {
+							if regexp_array[inner_iterator].symbols.len() > 0 {
+								if carry_accumulator == '!' {
+									carry_accumulator = regexp_array[inner_iterator].symbols.pop().expect("boom");
+								} else {
+									let temp_symbol: char = regexp_array[inner_iterator].symbols.pop().expect("boom");
+									regexp_array[inner_iterator].symbols.push( carry_accumulator );
+									carry_accumulator = temp_symbol;
+								}
+								
+								println!("carry: {}", carry_accumulator);
+								println!("new array value: {:?}", regexp_array[inner_iterator].symbols);
+							}
+						}
+						
+						inner_iterator += 1;
+					}
+
+					regexp_array[regexp_iterator].symbols.push( carry_accumulator );
+					carry_accumulator = '!';
+					println!("ARRAY: {:?}", regexp_array[regexp_iterator].symbols);
 				}
 					
 			} else if current_regexp_symbol.max == usize::MAX &&
